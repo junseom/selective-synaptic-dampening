@@ -28,6 +28,7 @@ import models
 from unlearn import *
 from utils import *
 import forget_full_class_strategies
+from experiment_reporting import print_run_result, print_run_start
 import datasets
 import models
 import conf
@@ -191,6 +192,7 @@ wandb.init(
 # Time the method
 import time
 
+print_run_start("full-class forgetting", args)
 start = time.time()
 
 # executes the method passed via args
@@ -199,7 +201,7 @@ testacc, retainacc, zrf, mia, d_f = getattr(forget_full_class_strategies, args.m
 )
 end = time.time()
 time_elapsed = end - start
-print(testacc, retainacc, zrf, mia)
+print_run_result(testacc, retainacc, zrf, mia, d_f, time_elapsed)
 
 # Logging
 wandb.log(

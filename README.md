@@ -36,12 +36,99 @@ imp.data += p.grad.data.clone().abs()
 
 ## Usage
 
-All experiments can be run via
+리팩토링 후에는 저장소 루트에서 `src/run_experiments.sh` 하나로 실험을 실행합니다.
 
 ```
-./MAIN_run_experiments.sh 0 # to run experiments on GPU 0 (nvidia-smi)
+./src/run_experiments.sh cifar10-random-resnet 0 42
 ```
-You might encounter issues with executing this file due to different line endings with Windows and Unix. Use dos2unix "filename" to fix.
+
+인자는 순서대로 `실험 이름`, `GPU 번호`, `seed`입니다. 위 예시는 GPU 0에서
+`cifar10-random-resnet` 실험을 seed 42로 실행합니다.
+
+실행 가능한 실험 이름은 아래 명령어로 확인할 수 있습니다.
+
+```
+./src/run_experiments.sh --help
+```
+
+현재 지원하는 실험 이름은 다음과 같습니다.
+
+```
+cifar10-random-resnet
+cifar10-random-vit
+cifar20-fullclass-resnet
+cifar20-fullclass-vit
+cifar20-subclass-resnet
+cifar20-subclass-vit
+cifar100-fullclass-resnet
+cifar100-fullclass-vit
+pins-fullclass-resnet
+all-resnet
+all-vit
+all
+```
+
+각 실험을 실행하기 전에 필요한 pretrained weight 경로가 설정되어 있어야 합니다.
+기본 경로가 없는 실험은 환경변수로 weight 경로를 넘겨 실행합니다.
+
+```
+CIFAR20_RESNET_WEIGHT_PATH=/path/to/model.pth ./src/run_experiments.sh cifar20-fullclass-resnet 0 42
+```
+
+사용 가능한 weight path 환경변수는 다음과 같습니다.
+
+```
+CIFAR10_RESNET_WEIGHT_PATH
+CIFAR10_VIT_WEIGHT_PATH
+CIFAR20_RESNET_WEIGHT_PATH
+CIFAR20_VIT_WEIGHT_PATH
+CIFAR100_RESNET_WEIGHT_PATH
+CIFAR100_VIT_WEIGHT_PATH
+PINS_RESNET_WEIGHT_PATH
+```
+
+실행 커맨드 예시는 다음과 같습니다.
+
+```bash
+# CIFAR10 random forgetting, ResNet18, GPU 0, seed 42
+./src/run_experiments.sh cifar10-random-resnet 0 42
+
+# CIFAR10 random forgetting, ViT
+CIFAR10_VIT_WEIGHT_PATH=/path/to/vit_cifar10.pth ./src/run_experiments.sh cifar10-random-vit 0 42
+
+# CIFAR20 full-class forgetting, ResNet18
+CIFAR20_RESNET_WEIGHT_PATH=/path/to/resnet_cifar20.pth ./src/run_experiments.sh cifar20-fullclass-resnet 0 42
+
+# CIFAR20 subclass forgetting, ResNet18
+CIFAR20_RESNET_WEIGHT_PATH=/path/to/resnet_cifar20.pth ./src/run_experiments.sh cifar20-subclass-resnet 0 42
+
+# CIFAR100 full-class forgetting, ViT
+CIFAR100_VIT_WEIGHT_PATH=/path/to/vit_cifar100.pth ./src/run_experiments.sh cifar100-fullclass-vit 0 42
+
+# Pins Face Recognition full-class forgetting, ResNet18
+PINS_RESNET_WEIGHT_PATH=/path/to/pins_resnet.pth ./src/run_experiments.sh pins-fullclass-resnet 0 42
+
+# ResNet 계열 실험 전체 실행
+CIFAR10_RESNET_WEIGHT_PATH=/path/to/resnet_cifar10.pth \
+CIFAR20_RESNET_WEIGHT_PATH=/path/to/resnet_cifar20.pth \
+CIFAR100_RESNET_WEIGHT_PATH=/path/to/resnet_cifar100.pth \
+PINS_RESNET_WEIGHT_PATH=/path/to/pins_resnet.pth \
+./src/run_experiments.sh all-resnet 0 42
+
+# ViT 계열 실험 전체 실행
+CIFAR10_VIT_WEIGHT_PATH=/path/to/vit_cifar10.pth \
+CIFAR20_VIT_WEIGHT_PATH=/path/to/vit_cifar20.pth \
+CIFAR100_VIT_WEIGHT_PATH=/path/to/vit_cifar100.pth \
+./src/run_experiments.sh all-vit 0 42
+```
+
+스크립트는 각 Python 명령어를 실행하기 전에 터미널에 출력하고, 실험이 끝나면
+`TestAcc`, `RetainTestAcc`, `ZRF`, `MIA`, `Df`, `MethodTime` 값을 이름과 함께
+출력합니다.
+
+기존 개별 실험 스크립트도 `src/` 안에 그대로 남아 있습니다. 필요하면 예전처럼
+`cd src` 후 `./cifar10_random_exps.sh 0 42` 형태로 직접 실행할 수 있습니다.
+Windows/Unix 줄바꿈 차이로 실행 문제가 생기면 `dos2unix "filename"`을 사용하세요.
 
 ## Setup
 

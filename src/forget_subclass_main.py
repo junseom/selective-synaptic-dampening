@@ -27,6 +27,7 @@ import models
 from unlearn import *
 from utils import *
 import forget_subclass_strategies
+from experiment_reporting import print_run_result, print_run_start
 import datasets
 import models
 import conf
@@ -191,6 +192,7 @@ wandb.init(
 
 import time
 
+print_run_start("subclass forgetting", args)
 start = time.time()
 
 
@@ -201,7 +203,7 @@ testacc, retainacc, zrf, mia, d_f = getattr(forget_subclass_strategies, args.met
 end = time.time()
 time_elapsed = end - start
 
-print(testacc, retainacc, zrf, mia)
+print_run_result(testacc, retainacc, zrf, mia, d_f, time_elapsed)
 wandb.log(
     {
         "TestAcc": testacc,
